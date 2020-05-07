@@ -4,10 +4,11 @@ import rospy
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
 from math import pow, atan2, sqrt
-from goal.msg import DoDishesAction, DoDishesGoal
+
+from learning_tf.srv import *
+
 
 class TurtleBot:
-
     def __init__(self):
         # Creates a node with name 'turtlebot_controller' and make sure it is a
         # unique node (using anonymous=True).
@@ -22,11 +23,7 @@ class TurtleBot:
         self.pose_subscriber = rospy.Subscriber('/turtle1/pose',
                                                 Pose, self.update_pose)
 
-
-        self.pose_subscriber = rospy.Subscriber('/turtle1/goal_pose',
-                                                Pose, self.update_pose)
         self.pose = Pose()
-        self.goal_pose = Pose()
         self.rate = rospy.Rate(10)
 
     def update_pose(self, data):
@@ -56,36 +53,43 @@ class TurtleBot:
         """See video: https://www.youtube.com/watch?v=Qh15Nol5htM."""
         return atan2(goal_pose.y - self.pose.y, goal_pose.x - self.pose.x)
 
-    def angular_vel(self, goal_pose, constant=6):
+    def angular_vel(self, goal_pose, constant=12):
         """See video: https://www.youtube.com/watch?v=Qh15Nol5htM."""
         return constant * (self.steering_angle(goal_pose) - self.pose.theta)
 
-    def move2goal(self):
+    def move2goal(self, x, y):
         """Moves the turtle to the goal."""
-
-        # Get the input from the user.
-        # changed to pub/sub nav nodes
-
-
-        # Please, insert a number slightly greater than 0 (e.g. 0.01).
-        distance_tolerance = 0.5 #set constantb
-
+        goal_pose = Pose()
+        goal_pose.x = x
+        goal_pose.y = y
+        print('Going to :')
+        print(goal_pose)
+        distance_tolerance = 0.5
         vel_msg = Twist()
 
-        while self.euclidean_distance(self.goal_pose) >= distance_tolerance:
+        while self.euclidean_distance(goal_pose) >= distance_tolerance:
+            #
+            while self.steering_angle(goal_pose)-self.pose.theta >= .01:
+                vel_msg.linear.x = 0
+                vel_msg.linear.y = 0
+                vel_msg.linear.z = 0
 
-            # Porportional controller.
-            # https://en.wikipedia.org/wiki/Proportional_control
+
+                vel_msg.angular.x = 0
+                vel_msg.angular.y = 0
+                vel_msg.angular.z = self.angular_vel(goal_pose)
+
+                self.velocity_publisher.publish(vel_msg)
 
             # Linear velocity in the x-axis.
-            vel_msg.linear.x = self.linear_vel(self.goal_pose)
+            vel_msg.linear.x = self.linear_vel(goal_pose)
             vel_msg.linear.y = 0
             vel_msg.linear.z = 0
 
             # Angular velocity in the z-axis.
             vel_msg.angular.x = 0
             vel_msg.angular.y = 0
-            vel_msg.angular.z = self.angular_vel(self.goal_pose)
+            vel_msg.angular.z = self.angular_vel(goal_pose)
 
             # Publishing our vel_msg
             self.velocity_publisher.publish(vel_msg)
@@ -98,12 +102,17 @@ class TurtleBot:
         vel_msg.angular.z = 0
         self.velocity_publisher.publish(vel_msg)
 
-        # If we press control + C, the node will stop.
-        rospy.spin()
+def handle_moveto(goal):
+    print(goal)
+    x.move2goal(goal.x, goal.y)
+    response = 1
+    return response
 
 if __name__ == '__main__':
-        try:
-            x = TurtleBot()
-            x.move2goal()
-        except rospy.ROSInterruptException:
-            pass
+    try:
+        x = TurtleBot()
+        s = rospy.Service('turtle_controller', turtle_msg, handle_moveto)
+        rospy.spin()
+        # If we press control + C, the node will stop.
+    except rospy.ROSInterruptException:
+        pass

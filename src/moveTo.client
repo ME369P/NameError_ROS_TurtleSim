@@ -1,0 +1,20 @@
+#! /usr/bin/env python
+import roslib
+roslib.load_manifest('learning_tf')
+
+import rospy
+import actionlib
+from geometry_msgs.msg import Twist
+from turtlesim.msg import Pose
+
+from goal.msg import moveAction, moveGoal
+
+if __name__ == '__main__':
+    rospy.init_node('move_client')
+    client = actionlib.SimpleActionClient('moveTo', turtlesim_)
+    client.wait_for_server()
+
+    goal = DoDishesGoal()
+    # Fill in the goal here
+    client.send_goal(goal)
+    client.wait_for_result(rospy.Duration.from_sec(5.0))
