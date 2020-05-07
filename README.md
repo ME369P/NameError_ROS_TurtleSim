@@ -33,7 +33,8 @@ The path planning algorithm is included in the line_of_sight function in our tes
 
 The line-of-sight obstacle avoidance works by getting the equation of a line and stepping through x positions to see if there is an obstacle within a radius of the turtle's path. If there is an obstacle identified, the turtle can "sidestep" the obstacle by taking a different path. The following diagram offers a simple illustration of this concept.
 
-![Obstacle Avoidance](https://github.com/johnathantran/autotemplogger/blob/master/obstacle_avoidance.png)
+![Obstacle Avoidance]
+(https://github.com/noelbrownback/TurtleSim/blob/master/obstacle_avoidance.png)
 
 
 
