@@ -80,6 +80,7 @@ def goal_client(x, y):
 class obstacle():
     def __init__(self):
         obs_subscriber = rospy.Subscriber('/obs_turtle1/pose', Pose, self.update_obs)
+        rospy.spin()
         print(obs_subscriber)
         self.pose = Pose()
         self.rate = rospy.Rate(10)
@@ -101,6 +102,7 @@ if __name__ == '__main__':
     obs = (5, 7)
     turtle = TurtleBot()
     print(turtle.pose)
+    rospy.spin()
     blocked, point = line_of_sight(init_pose, goal, obs)
     if blocked:
         print('blocked. obstacle at:', point)
@@ -110,5 +112,5 @@ if __name__ == '__main__':
         print(stillblocked, point)
     else:
         print('clear. Going to goal at:', point)
-
+    rospy.spin()
 
