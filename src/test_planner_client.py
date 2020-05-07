@@ -36,34 +36,29 @@ def line_of_sight(point, goal, obstacles):
     goal_y = goal[1]
     point_x = point[0]
     point_y = point[1]
+    obs = obstacles
     num = (goal_y - point_y)
     den = (goal_x - point_x)
+    print('1')
+    blocked = False
+    waypoints = goal
     if den == 0:
         x = point_x
-        for y in range(point_y, goal_y):
+        for y in range(int(point_y), goal_y):
             if distance((x, y), obs) <= 2:
                 # obs_ avoidance
                 blocked = True
                 return blocked, obs
-            else:
-                waypoints = goal
-                blocked = False
-
     else:
-        for x in range(point_x, goal_x):
+        for x in range(int(point_x), goal_x):
             slope = (goal_y - point_y) / (goal_x - point_x)
             print(slope)
             b = point_y - point_x * slope
             y = slope * x + b
-
-            print("loc", x, y)
             if distance((x, y), obs) <= 2:
                 # obs_ avoidance
                 blocked = True
                 return blocked, obs
-            else:
-                waypoints = goal
-                blocked = False
     return blocked, waypoints
 
 
@@ -79,11 +74,9 @@ def goal_client(x, y):
 
 class obstacle():
     def __init__(self):
-        obs_subscriber = rospy.Subscriber('/obs_turtle1/pose', Pose, self.update_obs)
-        rospy.spin()
-        print(obs_subscriber)
+        self.obs_subscriber = rospy.Subscriber('/obs_turtle1/pose', Pose, self.update_obs)
         self.pose = Pose()
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(1)
 
     def update_obs(self, data):
         """Callback function which is called when a new message of type Pose is
@@ -91,26 +84,36 @@ class obstacle():
         self.pose = data
         self.pose.x = round(self.pose.x, 4)
         self.pose.y = round(self.pose.y, 4)
-        print('updated obs')
+        self.rate.sleep()
+
 
 if __name__ == '__main__':
     rospy.init_node('Planner', anonymous=True)
+    goal_client(1, 1)
     obs = obstacle()
-    print(obs.pose)
-    init_pose = (1, 1)
-    goal = (6, 8)
-    obs = (5, 7)
     turtle = TurtleBot()
-    print(turtle.pose)
-    rospy.spin()
-    blocked, point = line_of_sight(init_pose, goal, obs)
-    if blocked:
-        print('blocked. obstacle at:', point)
-        print('rerouting')
-        stillblocked, point = line_of_sight(
-            init_pose, (init_pose[0], goal[1]), obs)
-        print(stillblocked, point)
-    else:
-        print('clear. Going to goal at:', point)
-    rospy.spin()
-
+    while not rospy.is_shutdown():
+        init_pose = (turtle.pose.x, turtle.pose.y)
+        goal = (6, 8)
+        obs_t = (obs.pose.x, obs.pose.y)
+        print(obs_t)
+        if obs.pose.x != 0:
+            blocked, point = line_of_sight(init_pose, goal, obs_t)
+            if blocked:
+                print('blocked. obstacle at:', point)
+                print('rerouting')
+                stillblocked, point = line_of_sight(
+                    init_pose, (init_pose[0], goal[1]), obs_t)
+                waypoints = [(init_pose[0], goal[1]),goal]
+                print('new waypoints:', waypoints)
+                if not stillblocked:
+                    for waypoint in waypoints:
+                        goal_client(waypoint[0],waypoint[1])
+                    stillblocked = True
+            else:
+                print('clear. Going to goal at:', point)
+                goal_client(goal[0],goal[1])
+        else:
+            print('No obstacles. Going to goal at:', goal)
+            goal_client(goal[0],goal[1])
+        rospy.sleep(1)

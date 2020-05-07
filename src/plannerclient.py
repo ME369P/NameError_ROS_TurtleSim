@@ -18,7 +18,7 @@ def goal_client(x, y):
 
 
 if __name__ == '__main__':
-    waypoints = [(1, 1), (1, 8), (8, 8), (8, 1)]
+    waypoints = [(1, 1), (1, 8), (8, 8), (8, 1),(1,1)]
     for waypoint in waypoints:
         print(waypoint)
         result = goal_client(waypoint[0], waypoint[1])

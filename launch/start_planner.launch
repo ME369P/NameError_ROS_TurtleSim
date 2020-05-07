@@ -6,6 +6,6 @@
       <param name="turtle" type="string" value="turtle1" />
     </node>
 
-    <node name="client" pkg="learning_tf" type="plannersrv.py" output="screen"/>
- 	<node name="server" pkg="learning_tf" type="plannerclient.py" output="screen"/>
+    <node name="server" pkg="learning_tf" type="plannersrv.py" output="screen"/>
+ 	<node name="client" pkg="learning_tf" type="test_planner_client.py" output="screen"/>
 </launch>
