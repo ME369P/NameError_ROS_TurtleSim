@@ -1,27 +1,35 @@
 # TurtleSim
 
-Packages used:
+## Packages used:
 TurtleSim
 
-Goal:
+## Goal:
 This project aims to integrate a basic path planning algorithm to set waypoints and avoid obstacles in the basic ROS TurtleSim package. It demonstrates and expands on the basic concepts of ROS and path planning a robot in a simulated environment.
 
-Using the Code:
-Clone this repository into a catkin workspace on your computer and run the .launch files found in the launch folder. Our demos include:
+## Using the Code:
+Clone this repository into a catkin workspace on your computer and run the .launch files found in the launch folder. It is also possible to download the source code for ROS TurtleSim from the official GitHub, modify the source code in C++, and use the modified package instead of the preinstalled ROS TurtleSim package. To do this, clone the repository to a catkin workspace found here:
+https://github.com/ros/ros_tutorials
+
+Our demos include:
 
 - Spawning a second turtle into the map as an "obstacle"
 - Drawing a square using waypoints
 - Adding basic path planning around an obstacle in the turtle's path
 
-Future Applications:
+## Future Applications:
 This project can potentially be recreated by programming a similar path planning algorithm in Gazebo, a ROS simulation tool. We have already taken some steps toward this goal, including:
 
 - Incorporated depth camera sensor into turtlebot by adding plugins to the code
 - Manipulated turtlebot 3 to move with live commands
 
+### Next Steps for this Project:
+- Using the depth camera on the bot to create a map of the environment
+- Localizing the robot
+- A package will contain files related to localization (a launch file will launch the node and add the necessary parameters in order to properly configure it)
+- Incorporate the path planning system
+- Use a ROS program to interact with the nav stack
 
 # Resources:
-
 The original tutorial for moving the turtle from Point A to Point B can be found here: http://wiki.ros.org/turtlesim/Tutorials/Go%20to%20Goal
 
 We also adapted the listener and broadcaster nodes from these ROS tutorials:
