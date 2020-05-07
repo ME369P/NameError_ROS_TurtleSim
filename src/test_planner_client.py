@@ -12,6 +12,7 @@ from learning_tf.srv import *
 def distance(path, obs):
     return m.sqrt((obs[0] - path[0])**2 + (obs[1] - path[1])**2)
 
+
 class TurtleBot:
     def __init__(self):
         # A subscriber to the topic '/turtle1/pose'. self.update_pose is called
@@ -76,27 +77,38 @@ def goal_client(x, y):
         print('service call failed')
 
 
-# def update_obs(self, data):
-#     """Callback function which is called when a new message of type Pose is
-#     received by the subscriber."""
-#     self.pose = data
-#     self.pose.x = round(self.pose.x, 4)
-#     self.pose.y = round(self.pose.y, 4)
+class obstacle():
+    def __init__(self):
+        obs_subscriber = rospy.Subscriber('/obs_turtle1/pose', Pose, self.update_obs)
+        print(obs_subscriber)
+        self.pose = Pose()
+        self.rate = rospy.Rate(10)
+
+    def update_obs(self, data):
+        """Callback function which is called when a new message of type Pose is
+        received by the subscriber."""
+        self.pose = data
+        self.pose.x = round(self.pose.x, 4)
+        self.pose.y = round(self.pose.y, 4)
+        print('updated obs')
 
 if __name__ == '__main__':
     rospy.init_node('Planner', anonymous=True)
-    # self.pose_subscriber = rospy.Subscriber('/obs/pose',
-    #                                     Pose, self.update_obs)
-
+    obs = obstacle()
+    print(obs.pose)
     init_pose = (1, 1)
     goal = (6, 8)
     obs = (5, 7)
     turtle = TurtleBot()
+    print(turtle.pose)
     blocked, point = line_of_sight(init_pose, goal, obs)
     if blocked:
         print('blocked. obstacle at:', point)
         print('rerouting')
-        stillblocked, point = line_of_sight(init_pose, (init_pose[0], goal[1]), obs)
+        stillblocked, point = line_of_sight(
+            init_pose, (init_pose[0], goal[1]), obs)
         print(stillblocked, point)
     else:
         print('clear. Going to goal at:', point)
+
+
