@@ -44,17 +44,16 @@ def line_of_sight(point, goal, obstacles):
     if den == 0:
         x = point_x
         for y in range(int(point_y), goal_y):
-            if distance((x, y), obs) <= 3:
+            if distance((x, y), obs) <= 1.5:
                 # obs_ avoidance
                 blocked = True
                 return blocked, obs
     else:
         for x in range(int(point_x), goal_x):
             slope = (goal_y - point_y) / (goal_x - point_x)
-            print(slope)
             b = point_y - point_x * slope
             y = slope * x + b
-            if distance((x, y), obs) <= 3:
+            if distance((x, y), obs) <= 1.5:
                 # obs_ avoidance
                 blocked = True
                 return blocked, obs
@@ -81,10 +80,11 @@ class obstacle():
     def update_obs(self, data):
         """Callback function which is called when a new message of type Pose is
         received by the subscriber."""
-        self.pose = data
-        self.pose.x = round(self.pose.x, 4)
-        self.pose.y = round(self.pose.y, 4)
-        self.rate.sleep()
+        if data != 0:
+            self.pose = data
+            self.pose.x = round(self.pose.x, 4)
+            self.pose.y = round(self.pose.y, 4)
+            self.rate.sleep()
 
 
 if __name__ == '__main__':
@@ -92,6 +92,7 @@ if __name__ == '__main__':
     goal_client(1, 1)
     obs = obstacle()
     turtle = TurtleBot()
+    count = 0
     while not rospy.is_shutdown():
         init_pose = (turtle.pose.x, turtle.pose.y)
         goal = (6, 8)
@@ -106,15 +107,19 @@ if __name__ == '__main__':
                     init_pose, (init_pose[0], goal[1]), obs_t)
                 waypoints = [(init_pose[0], goal[1]),goal]
                 print('new waypoints:', waypoints)
+                
                 if not stillblocked:
                     for waypoint in waypoints:
+                        print('Going to waypoint:',waypoint)
                         goal_client(waypoint[0],waypoint[1])
-                        print(going)
+
                     stillblocked = True
+
             else:
                 print('clear. Going to goal at:', point)
                 goal_client(goal[0],goal[1])
-        else:
-            print('No obstacles. Going to goal at:', goal)
+        elif obs.pose.x == 0 and count >0:
             goal_client(goal[0],goal[1])
+        count +=1
+        print(count)
         rospy.sleep(1)

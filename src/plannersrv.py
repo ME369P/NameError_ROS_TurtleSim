@@ -53,7 +53,7 @@ class TurtleBot:
         """See video: https://www.youtube.com/watch?v=Qh15Nol5htM."""
         return atan2(goal_pose.y - self.pose.y, goal_pose.x - self.pose.x)
 
-    def angular_vel(self, goal_pose, constant=12):
+    def angular_vel(self, goal_pose, constant=10):
         """See video: https://www.youtube.com/watch?v=Qh15Nol5htM."""
         return constant * (self.steering_angle(goal_pose) - self.pose.theta)
 
@@ -67,20 +67,21 @@ class TurtleBot:
         distance_tolerance = 0.5
         vel_msg = Twist()
 
+
+        while self.steering_angle(goal_pose)-self.pose.theta >= .01:
+            vel_msg.linear.x = 0
+            vel_msg.linear.y = 0
+            vel_msg.linear.z = 0
+
+
+            vel_msg.angular.x = 0
+            vel_msg.angular.y = 0
+            vel_msg.angular.z = self.angular_vel(goal_pose)
+
+            self.velocity_publisher.publish(vel_msg)
+            self.rate.sleep()
+        
         while self.euclidean_distance(goal_pose) >= distance_tolerance:
-            #
-            while self.steering_angle(goal_pose)-self.pose.theta >= .01:
-                vel_msg.linear.x = 0
-                vel_msg.linear.y = 0
-                vel_msg.linear.z = 0
-
-
-                vel_msg.angular.x = 0
-                vel_msg.angular.y = 0
-                vel_msg.angular.z = self.angular_vel(goal_pose)
-
-                self.velocity_publisher.publish(vel_msg)
-
             # Linear velocity in the x-axis.
             vel_msg.linear.x = self.linear_vel(goal_pose)
             vel_msg.linear.y = 0
