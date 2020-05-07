@@ -39,13 +39,12 @@ def line_of_sight(point, goal, obstacles):
     obs = obstacles
     num = (goal_y - point_y)
     den = (goal_x - point_x)
-    print('1')
     blocked = False
     waypoints = goal
     if den == 0:
         x = point_x
         for y in range(int(point_y), goal_y):
-            if distance((x, y), obs) <= 2:
+            if distance((x, y), obs) <= 3:
                 # obs_ avoidance
                 blocked = True
                 return blocked, obs
@@ -55,10 +54,11 @@ def line_of_sight(point, goal, obstacles):
             print(slope)
             b = point_y - point_x * slope
             y = slope * x + b
-            if distance((x, y), obs) <= 2:
+            if distance((x, y), obs) <= 3:
                 # obs_ avoidance
                 blocked = True
                 return blocked, obs
+
     return blocked, waypoints
 
 
@@ -109,6 +109,7 @@ if __name__ == '__main__':
                 if not stillblocked:
                     for waypoint in waypoints:
                         goal_client(waypoint[0],waypoint[1])
+                        print(going)
                     stillblocked = True
             else:
                 print('clear. Going to goal at:', point)
