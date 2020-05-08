@@ -1,7 +1,7 @@
 # TurtleSim
 
 ## Packages used:
-TurtleSim
+TurtleSim, rospy, roslib, tf
 
 ## Goal:
 This project aims to integrate a basic path planning algorithm to set waypoints and avoid obstacles in the basic ROS TurtleSim package. It demonstrates and expands on the basic concepts of ROS and path planning a robot in a simulated environment.
